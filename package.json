@@ -1,0 +1,48 @@
+{
+  "name": "svc-fbr",
+  "version": "0.0.0",
+  "description": "file browser service",
+  "main": "lib/index.js",
+  "scripts": {
+    "prepublish": "npm run build",
+    "build": "babel src --out-dir lib",
+    "pretest": "babel test --out-dir ctest",
+    "test": "grunt test",
+    "test-coverage": "istanbul cover _mocha --report lcovonly -- -R spec ctest/test.*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/forfutureLLC/svc-fbr.git"
+  },
+  "keywords": [
+    "file",
+    "browser",
+    "service"
+  ],
+  "author": "GochoMugo <mugo@forfuture.co.ke> (https://gochomugo.github.io/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/forfutureLLC/svc-fbr/issues"
+  },
+  "homepage": "https://github.com/forfutureLLC/svc-fbr",
+  "dependencies": {
+    "cli-output": "^0.1.0",
+    "express": "^4.13.3",
+    "lodash": "^3.10.1",
+    "simple-argparse": "^0.3.0"
+  },
+  "devDependencies": {
+    "coveralls": "^2.11.3",
+    "grunt": "^0.4.5",
+    "grunt-cli": "^0.1.13",
+    "grunt-eslint": "^17.0.0",
+    "grunt-mocha-test": "^0.12.7",
+    "istanbul": "^0.3.17",
+    "load-grunt-tasks": "^3.2.0",
+    "mocha-lcov-reporter": "^0.0.2",
+    "should": "^7.0.2"
+  },
+  "engines": {
+    "node": ">= 0.10.0"
+  }
+}

@@ -1,0 +1,11 @@
+# ES6 Source
+src/
+
+# Tests
+test/
+
+# Others
+.editorconfig
+.eslintrc
+Gruntfile.js
+
