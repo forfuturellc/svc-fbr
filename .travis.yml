@@ -5,3 +5,12 @@ node_js:
 - '0.10'
 script: npm test
 after_script: npm run test-coverage && cat ./coverage/lcov.info | coveralls
+deploy:
+  provider: npm
+  email: mugo@forfuture.co.ke
+  api_key:
+    secure: AJz18Rf3yIzXW2ogF4ywrnzXKwUsakkxDIgZoVyj1el+wUp6lOdFow/WxjBrMSyeJ9EQxqKT9m7tW8cFdOAL3hyggase2E0ao7UZRPjEDGLLUpi1q11RBazttgpZLNL5aEy6XT31DkHnr6XXEkmG4RiFbTvxmairDl932PbZtwQtEWzBgaxbevybHWhhnCyAqTHjur/iCX9ym1fv28pll7seFXx+37b+x/UAspNveaMJanguY40QuJWTO7HurnpVC6KPfBRX1Qi2zqyvTu5BSddsgl7vio8mrdrnYxPWQAWBRdwyKzcXuxUSdNNz3zdzGtldBDnFFL9Pa595u9V2j/zA95RQm3UhYmRtVzCjCkCY7jzkefQaKRpCQUXr77wkL4qPT7SFkE692chB+blwjYJUcQuXWVSp5bztVscIhdnitj+mgLj1+XbrVVE2cQGh0qnU7Wq5ab+tAZ0mBel/Wq/H4x3lv6WLumPoU1QLghL10SbG6iw1/6L7ha0AhV3wxTtCk/fWh2Cb80+pZ3svVFj1iwdM5cgsrllbUQDEtQ690nYB+07qlYEdbUKS5sxrPebZsv17QXo4uWhROAYonZiw46/trgPDJTdFF4RtdwMrvvncA8XO7iBsntMu70kLNZn1CEY7dVqZBea77/KqzkkumN1QzBWuj4rDhLrXjGA=
+  on:
+    tags: true
+    repo: forfutureLLC/svc-fbr
+    branch: master
