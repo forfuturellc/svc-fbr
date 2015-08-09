@@ -34,7 +34,7 @@ const server = http.Server(app);
 
 // browse filesystem
 app.get("/", function(req, res, next) {
-  const filepath = req.query.path || config.home;
+  const filepath = req.query.path || app.get("config").home;
   return fs.handle(filepath, function(err, descriptor) {
     if (err) {
       return next(err);
@@ -78,6 +78,7 @@ function start(options, callback) {
     cb = options;
   }
 
+  app.set("config", ops);
   server.listen(ops.port, ops.ip, function() {
     return cb(null);
   }).on("error", function(err) {

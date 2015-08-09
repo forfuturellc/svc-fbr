@@ -6,7 +6,7 @@
   "scripts": {
     "prepublish": "npm run build",
     "build": "babel src --out-dir lib",
-    "pretest": "babel test --out-dir ctest",
+    "pretest": "npm run build ; babel test --out-dir ctest",
     "test": "grunt test",
     "test-coverage": "istanbul cover _mocha --report lcovonly -- -R spec ctest/test.*.js"
   },
