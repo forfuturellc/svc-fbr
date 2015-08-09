@@ -32,6 +32,7 @@
     "simple-argparse": "^0.3.0"
   },
   "devDependencies": {
+    "async": "^1.4.1",
     "babel": "^5.8.21",
     "coveralls": "^2.11.3",
     "fresh-require": "^1.0.3",
