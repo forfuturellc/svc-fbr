@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "description": "file browser service",
   "main": "lib/index.js",
+  "bin": {
+    "svc-fbr": "bin/svc-fbr"
+  },
   "scripts": {
     "prepublish": "npm run build",
     "build": "babel src --out-dir lib",

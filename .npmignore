@@ -3,9 +3,9 @@ src/
 
 # Tests
 test/
+ctest/
 
 # Others
 .editorconfig
 .eslintrc
 Gruntfile.js
-
