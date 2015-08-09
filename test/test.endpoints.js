@@ -11,6 +11,7 @@ const should = require("should");
 
 
 // own modules
+const config = require("../lib/config");
 const server = require("../lib/server");
 
 
@@ -36,6 +37,14 @@ describe("GET /", function() {
       should(err).not.be.ok();
       should(body.isFile).eql(true);
       should(body.content).eql(fs.readFileSync(__filename).toString());
+      return done();
+    });
+  });
+
+  it("uses the home if query path is not passed", function(done) {
+    request.get({ url }, function(err, res, body) {
+      should(err).not.be.ok();
+      should.deepEqual(body.content, fs.readdirSync(config.home));
       return done();
     });
   });
