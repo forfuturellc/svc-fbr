@@ -53,7 +53,7 @@ describe("lib/config.ip", function() {
 describe("lib/config.port", function() {
   it("defaults to ${FBRS_PORT}", function() {
     const port = 9352;
-    process.env.FBRS_PORT = Number(port);
+    process.env.FBRS_PORT = port;
     config = fresh("../lib/config", require);
     should(config.port).eql(port);
   });
