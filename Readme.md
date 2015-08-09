@@ -3,6 +3,8 @@
 
 > File Browser Service
 
+[![node](https://img.shields.io/node/v/svc-fbr.svg?style=flat-square)](https://www.npmjs.com/package/svc-fbr) [![npm](https://img.shields.io/npm/v/svc-fbr.svg?style=flat-square)](https://www.npmjs.com/package/svc-fbr) [![Travis](https://img.shields.io/travis/forfutureLLC/svc-fbr.svg?style=flat-square)](https://travis-ci.org/forfutureLLC/svc-fbr) [![Gemnasium](https://img.shields.io/gemnasium/forfutureLLC/svc-fbr.svg?style=flat-square)](https://gemnasium.com/forfutureLLC/svc-fbr) [![Coveralls](https://img.shields.io/coveralls/forfutureLLC/svc-fbr.svg?style=flat-square)](https://coveralls.io/github/forfutureLLC/svc-fbr?branch=master)
+
 
 ## terminal usage:
 
