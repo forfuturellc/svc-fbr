@@ -86,11 +86,18 @@ function wrap(stats, callback) {
  * @param {Function} callback
  */
 function processDir(options, callback) {
-  return fs.readdir(options.path, function(err, dirs) {
+  return fs.readdir(options.path, function(err, filenames) {
     if (err) {
       return callback(err);
     }
-    return async.map(dirs, function(filename, done) {
+
+    if (options.ignoreDotFiles) {
+      filenames = _.filter(filenames, function(filename) {
+        return filename[0] !== ".";
+      });
+    }
+
+    return async.map(filenames, function(filename, done) {
       const abspath = path.resolve(options.path, filename);
       let stats = {
         filename: filename,
