@@ -25,6 +25,7 @@ const express = require("express");
 // own modules
 const config = require("./config");
 const fs = require("./fs");
+const utils = require("./utils");
 
 
 // module variables
@@ -46,6 +47,8 @@ app.get("/", function(req, res) {
     if (descriptor.content instanceof Buffer) {
       descriptor.content = descriptor.content.toString();
     }
+
+    utils.addType(descriptor);
 
     return res.json(descriptor);
   });

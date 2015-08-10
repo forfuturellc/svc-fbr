@@ -43,7 +43,7 @@ describe("lib/fs.handle", function() {
       dir: function(next) {
         fs.handle(mockPath, function(err, descriptor) {
           should(err).not.be.ok();
-          should(descriptor.isDirectory).eql(true);
+          should(descriptor.isDirectory()).eql(true);
           should(descriptor.content).be.an.Array();
           let sample = descriptor.content[0];
           should(sample.filename).be.a.String();
@@ -57,7 +57,7 @@ describe("lib/fs.handle", function() {
       dirUnstated: function(next) {
         fs.handle({ path: mockPath, statEach: false }, function(err, descriptor) {
           should(err).not.be.ok();
-          should(descriptor.isDirectory).eql(true);
+          should(descriptor.isDirectory()).eql(true);
           should(descriptor.content).be.an.Array();
           let sample = descriptor.content[0];
           should(sample.filename).be.a.String();
@@ -91,7 +91,7 @@ describe("lib/fs.handle", function() {
       file: function(next) {
         fs.handle(__filename, function(err, descriptor) {
           should(err).not.be.ok();
-          should(descriptor.isFile).eql(true);
+          should(descriptor.isFile()).eql(true);
           should(descriptor.content).be.an.instanceOf(Buffer);
           return next();
         });

@@ -7,7 +7,7 @@
 
 
 exports = module.exports = {
-  handle: handle,
+  handle,
 };
 
 
@@ -61,20 +61,8 @@ function wrap(stats, callback) {
     if (err) {
       return callback(err);
     }
-    let res = {
-      content,
-    };
-
-    [
-      "isFile", "isDirectory", "isBlockDevice", "isCharacterDevice",
-      "isSymbolicLink", "isFIFO", "isSocket",
-    ].forEach(function(funcName) {
-      if (stats[funcName]()) {
-        res[funcName] = true;
-      }
-    });
-
-    return callback(null, res);
+    stats.content = content;
+    return callback(null, stats);
   };
 }
 
