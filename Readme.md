@@ -6,19 +6,12 @@
 [![node](https://img.shields.io/node/v/svc-fbr.svg?style=flat-square)](https://www.npmjs.com/package/svc-fbr) [![npm](https://img.shields.io/npm/v/svc-fbr.svg?style=flat-square)](https://www.npmjs.com/package/svc-fbr) [![Travis](https://img.shields.io/travis/forfutureLLC/svc-fbr.svg?style=flat-square)](https://travis-ci.org/forfutureLLC/svc-fbr) [![Gemnasium](https://img.shields.io/gemnasium/forfutureLLC/svc-fbr.svg?style=flat-square)](https://gemnasium.com/forfutureLLC/svc-fbr) [![Coveralls](https://img.shields.io/coveralls/forfutureLLC/svc-fbr.svg?style=flat-square)](https://coveralls.io/github/forfutureLLC/svc-fbr?branch=master)
 
 
-## terminal usage:
+This module can be used in different ways:
 
-```bash
-svc-fbr: file browser service
+1. As a **standalone service**: running the module's server in the background allows different processes to use this service through a [REST API](#rest). This allows user to traverse an accessible network file system (NFS). The [terminal interface](#term) is useful in controlling the service on the host. **Note**: you can import the module in your Node.js applications to abstract the REST api.
 
-    ?, status      check status of service
-    H, help        show this help information
-    V, version     show version information
-    s, start       start service
-    x, stop        stop service
+1. As an **imported module**: you can simply `require` the module in Node.js applications thus using the [module API](#module-api). This should be used by application accessing file systems attached to the system.
 
-See https://github.com/forfutureLLC/svc-fbr for feature-requests and bug-reports
-```
 
 ## Module API:
 
@@ -30,7 +23,7 @@ const fbr = require("svc-fbr");
 
 Start the service.
 
-* `options` (Object): as [universal Options](#ops)
+* `options` ([service options](#service-ops))
 * `callback` (Function):
   * signature: `callback(err)`
 
@@ -39,7 +32,7 @@ Start the service.
 
 Ping the service.
 
-* `options` (Object): as [universal Options](#ops)
+* `options` ([service options](#service-ops))
 * `callback` (Function):
   * signature: `callback(err, response)`
   * `response` (Object): passed on success
@@ -50,28 +43,51 @@ Ping the service.
 
 Stop the service.
 
-* `options` (Object): as [universal Options](#ops)
+* `options` ([service options](#service-ops))
 * `callback` (Function):
   * signature: `callback(err)`
 
 
-<a name="ops"></a>
-### universal options
+### fbr.query(params, callback)
 
-Prescedence:
+Query service.
+
+* `options` ([service options](#service-ops) + [Parameters](#params))
+* `callback` (Function):
+  * signature: `callback(err, res)`
+
+
+<a name="service-ops"></a>
+### service options
+
+An `Object` of options as configurations of the service.
+
+Properties:
 
 * `ip` (String): ip of server
-  * `arguments`
-  * `${FBRS_IP}`
-  * `"127.0.0.1"`
 * `port` (Number): port of the server
-  * `arguments`
-  * `${FBRS_PORT}`
-  * `9432`
-* `home`: (String) path to home directory
-  * `arguments`
-  * `${FBRS_HOME}`
-  * `process.env.HOME`
+* `home`: (String) path to home directory. This is default path used if `path` parameter is **not** passed.
+
+
+Prescedence (from Left-To-Right):
+
+* `ip`: `arguments`, `${FBRS_IP}`, `"127.0.0.1"`
+* `port`: `arguments`, ${FBRS_PORT}`, `9432`
+* `home`: `arguments`, `${FBRS_HOME}`, `process.env.HOME`
+
+
+<a name="params"></a>
+### parameters
+
+An `Object` of query parameters.
+
+Properties:
+
+* `path` (String): path to look up
+* `ignoreDotFiles` (Boolean=false): ignore files with names starting with a `.` (dot).
+* `ignoreCurDir` (Boolean=false): ignore the current directory, `.`, from results.
+* `ignoreUpDir` (Boolean=false): ignore the upper directory, `..`, from results.
+* `statEach` (Boolean=true): stat each of the contained files if `path` is a directory.
 
 
 ## REST API:
@@ -85,8 +101,7 @@ Available endpoints once the service is started.
 GET /
 ```
 
-Queries:
-  * `path` (String): path to look up.
+The [paramters](#params) should be sent as query string.
 
 
 Success response:
@@ -123,6 +138,22 @@ GET /stop
 
 Success response:
   * status: `200 OK`
+
+
+<a name="term"></a>
+## terminal usage:
+
+```bash
+svc-fbr: file browser service
+
+    ?, status      check status of service
+    H, help        show this help information
+    V, version     show version information
+    s, start       start service
+    x, stop        stop service
+
+See https://github.com/forfutureLLC/svc-fbr for feature-requests and bug-reports
+```
 
 
 ## tips:
