@@ -33,11 +33,14 @@ const server = http.Server(app);
 
 
 // browse filesystem
-app.get("/", function(req, res, next) {
-  const filepath = req.query.path || app.get("config").home;
-  return fs.handle(filepath, function(err, descriptor) {
+app.get("/", function(req, res) {
+  const options = _.cloneDeep(req.query);
+  options.path = options.path || app.get("config").home;
+  return fs.handle(options, function(err, descriptor) {
     if (err) {
-      return next(err);
+      return res.json({
+        error: err,
+      });
     }
 
     if (descriptor.content instanceof Buffer) {

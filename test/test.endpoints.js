@@ -32,7 +32,7 @@ describe("GET /", function() {
     server.stop({ port }, done);
   });
 
-  it("passes query path to fs module", function(done) {
+  it("passes queries to fs module", function(done) {
     request.get({ url, qs: { path: __filename } }, function(err, res, body) {
       should(err).not.be.ok();
       should(body.isFile).eql(true);
@@ -44,7 +44,7 @@ describe("GET /", function() {
   it("uses the home if query path is not passed", function(done) {
     request.get({ url }, function(err, res, body) {
       should(err).not.be.ok();
-      should.deepEqual(body.content, fs.readdirSync(config.home));
+      should(body.content).be.an.Array();
       return done();
     });
   });
