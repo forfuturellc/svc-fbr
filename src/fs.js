@@ -97,6 +97,10 @@ function processDir(options, callback) {
       });
     }
 
+    if (!options.ignoreUpDir) {
+      filenames.push("..");
+    }
+
     return async.map(filenames, function(filename, done) {
       const abspath = path.resolve(options.path, filename);
       let stats = {
