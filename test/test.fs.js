@@ -50,6 +50,7 @@ describe("lib/fs.handle", function() {
           should(sample.path).be.a.String();
           should(sample.mtime).be.an.instanceOf(Date);
           should(hasFileWithName(descriptor, "..")).eql(true);
+          should(hasFileWithName(descriptor, ".")).eql(true);
           return next();
         });
       },
@@ -73,10 +74,17 @@ describe("lib/fs.handle", function() {
           return next();
         });
       },
-      dirUpDir: function(next) {
+      dirIgnoreUpDir: function(next) {
         fs.handle({ path: mockPath, ignoreUpDir: true }, function(err, descriptor) {
           should(err).not.be.ok();
           should(hasFileWithName(descriptor, "..")).eql(false);
+          return next();
+        });
+      },
+      dirIgnoreCurDir: function(next) {
+        fs.handle({ path: mockPath, ignoreCurDir: true }, function(err, descriptor) {
+          should(err).not.be.ok();
+          should(hasFileWithName(descriptor, ".")).eql(false);
           return next();
         });
       },

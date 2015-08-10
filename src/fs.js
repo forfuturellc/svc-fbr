@@ -101,6 +101,10 @@ function processDir(options, callback) {
       filenames.push("..");
     }
 
+    if (!options.ignoreCurDir) {
+      filenames.push(".");
+    }
+
     return async.map(filenames, function(filename, done) {
       const abspath = path.resolve(options.path, filename);
       let stats = {
