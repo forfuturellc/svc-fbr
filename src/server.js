@@ -7,9 +7,10 @@
 
 
 exports = module.exports = {
-  ping: ping,
-  start: start,
-  stop: stop,
+  ping,
+  query,
+  start,
+  stop,
 };
 
 
@@ -20,6 +21,7 @@ const http = require("http");
 // npm-installed modules
 const _ = require("lodash");
 const express = require("express");
+const request = require("request").defaults({ json: true });
 
 
 // own modules
@@ -75,21 +77,14 @@ app.get("/stop", function(req, res) {
  * @param {Function} [callback]
  */
 function start(options, callback) {
-  let ops = _.cloneDeep(config);
-  let cb = callback || function() { };
+  const args = utils.getArgs(options, [config], callback);
 
-  if (_.isObject(options)) {
-    _.merge(ops, options);
-  } else {
-    cb = options;
-  }
-
-  app.set("config", ops);
-  server.listen(ops.port, ops.ip, function() {
-    return cb(null);
+  app.set("config", args.options);
+  server.listen(args.options.port, args.options.ip, function() {
+    return args.callback(null);
   }).on("error", function(err) {
     if (err.code === "EADDRINUSE") {
-      return cb(err);
+      return args.callback(err);
     }
     console.error(err);
   });
@@ -103,23 +98,14 @@ function start(options, callback) {
  * @param {Function} [callback]
  */
 function stop(options, callback) {
-  let ops = _.cloneDeep(config);
-  let cb = callback || function() { };
+  const args = utils.getArgs(options, [config], callback);
+  const url = `http://${args.options.ip}:${args.options.port}/stop`;
 
-  if (_.isObject(options)) {
-    _.merge(ops, options);
-  } else {
-    cb = options;
-  }
-
-  const url = `http://${ops.ip}:${ops.port}/stop`;
-  return http.get(url, function() {
-    return cb(null);
-  }).on("error", function(err) {
-    if (err.code === "ECONNREFUSED") {
-      return cb(null);
+  return request.get(url, function(err) {
+    if (err && err.code !== "ECONNREFUSED") {
+      return args.callback(err);
     }
-    return cb(err);
+    return args.callback(null);
   });
 }
 
@@ -131,22 +117,38 @@ function stop(options, callback) {
  * @param {Function} callback
  */
 function ping(options, callback) {
-  let ops = _.cloneDeep(config);
-  let cb = callback || function() { };
+  const args = utils.getArgs(options, [config], callback);
+  const url = `http://${args.options.ip}:${args.options.port}/ping`;
 
-  if (_.isObject(options)) {
-    _.merge(ops, options);
-  } else {
-    cb = options;
-  }
-
-  const url = `http://${ops.ip}:${ops.port}/ping`;
-  return http.get(url, function() {
-    return cb(null, { running: true });
-  }).on("error", function(err) {
-    if (err.code === "ECONNREFUSED") {
-      return cb(null, { running: false });
+  return request.get(url, function(err) {
+    if (err) {
+      if (err.code === "ECONNREFUSED") {
+        return args.callback(null, { running: false });
+      }
+      return args.callback(err);
     }
-    return cb(err);
+    return args.callback(null, { running: true });
+  });
+}
+
+
+/**
+ * Query service
+ *
+ * @param {Object} params
+ * @param {Function} callback
+ */
+function query(params, callback) {
+  const args = utils.getArgs(params, [config], callback);
+  const url = `http://${args.options.ip}:${args.options.port}/`;
+
+  return request.get({
+    url,
+    qs: args.options,
+  }, function(err, res, body) {
+    if (err) {
+      return args.callback(err);
+    }
+    return args.callback(null, body);
   });
 }

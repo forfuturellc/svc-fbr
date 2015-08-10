@@ -33,6 +33,7 @@
     "cli-output": "^0.1.0",
     "express": "^4.13.3",
     "lodash": "^3.10.1",
+    "request": "^2.60.0",
     "simple-argparse": "^0.3.0"
   },
   "devDependencies": {

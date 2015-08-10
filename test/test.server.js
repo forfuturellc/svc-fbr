@@ -12,7 +12,7 @@ const server = require("../lib/server");
 describe("lib/server", function() {
   it("has a valid API", function() {
     let checked = { };
-    ["ping", "start", "stop"].forEach(function(name) {
+    ["ping", "start", "stop", "query"].forEach(function(name) {
       should(server[name]).be.a.Function();
       checked[name] = true;
     });
@@ -51,6 +51,10 @@ describe("lib/server.stop", function() {
     server.start({ port }, done);
   });
 
+  afterEach(function(done) {
+    server.stop({ port }, done);
+  });
+
   it("stops a running server", function(done) {
     server.stop({ port }, function(stopErr) {
       should(stopErr).not.be.ok();
@@ -59,6 +63,13 @@ describe("lib/server.stop", function() {
         should(res.running).eql(false);
         return done();
       });
+    });
+  });
+
+  it("ignores ECONNREFUSED error", function(done) {
+    server.stop({ port: 5409 }, function(stopErr) {
+      should(stopErr).not.be.ok();
+      return done();
     });
   });
 });
@@ -97,6 +108,27 @@ describe("lib/server.ping", function() {
           return done();
         });
       });
+    });
+  });
+});
+
+
+describe("lib/server.query", function() {
+  const port = 9245;
+
+  before(function(done) {
+    server.start({ port }, done);
+  });
+
+  after(function(done) {
+    server.stop({ port }, done);
+  });
+
+  it("does a query", function(done) {
+    server.query({ port, path: __dirname }, function(err, res) {
+      should(err).not.be.ok();
+      should(res.isDirectory).eql(true);
+      return done();
     });
   });
 });
