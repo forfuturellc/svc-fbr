@@ -58,7 +58,7 @@ Query service.
 
 
 <a name="service-ops"></a>
-### service options
+## service options
 
 An `Object` of options as configurations of the service.
 
@@ -72,22 +72,22 @@ Properties:
 Prescedence (from Left-To-Right):
 
 * `ip`: `arguments`, `${FBRS_IP}`, `"127.0.0.1"`
-* `port`: `arguments`, ${FBRS_PORT}`, `9432`
+* `port`: `arguments`, `${FBRS_PORT}`, `9432`
 * `home`: `arguments`, `${FBRS_HOME}`, `process.env.HOME`
 
 
 <a name="params"></a>
-### parameters
+## parameters
 
 An `Object` of query parameters.
 
 Properties:
 
 * `path` (String): path to look up
-* `ignoreDotFiles` (Boolean=false): ignore files with names starting with a `.` (dot).
-* `ignoreCurDir` (Boolean=false): ignore the current directory, `.`, from results.
-* `ignoreUpDir` (Boolean=false): ignore the upper directory, `..`, from results.
-* `statEach` (Boolean=true): stat each of the contained files if `path` is a directory.
+* `ignoreDotFiles` (Boolean=`false`): ignore files with names starting with a `.` (dot).
+* `ignoreCurDir` (Boolean=`false`): ignore the current directory, `.`, from results.
+* `ignoreUpDir` (Boolean=`false`): ignore the upper directory, `..`, from results.
+* `statEach` (Boolean=`true`): stat each of the contained files if `path` is a directory.
 
 
 ## REST API:
@@ -101,7 +101,7 @@ Available endpoints once the service is started.
 GET /
 ```
 
-The [paramters](#params) should be sent as query string.
+The [parameters](#params) should be sent as query string.
 
 
 Success response:
@@ -115,9 +115,9 @@ Success response:
   }
   ```
   where `<content>` would be:
-    * `String[]`: array of file names, if path points to directory
-    * `String`: file content, if path points to file
-  and `<type>` would be the name of [fs.Stats](https://nodejs.org/api/all.html#all_class_fs_stats) function name e.g. "isDirectory".
+  * `String[]`: array of [fs.Stats][fs_stats], if path points to directory
+  * `String`: file content, if path points to file
+  and `<type>` would be the name of a [fs.Stats][fs_stats] function e.g. "isDirectory", that returns `true`.
 
 
 ### ping service:
@@ -170,3 +170,6 @@ $ forever start svc-fbr start    # note the TWO <start>s
 __The MIT License (MIT)__
 
 Copyright (c) 2015 Forfuture LLC <we@forfuture.co.ke>
+
+
+[fs_stats]:https://nodejs.org/api/all.html#all_class_fs_stats
