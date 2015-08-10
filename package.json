@@ -1,6 +1,6 @@
 {
   "name": "svc-fbr",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "file browser service",
   "main": "lib/index.js",
   "bin": {

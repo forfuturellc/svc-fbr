@@ -13,6 +13,11 @@ This module can be used in different ways:
 1. As an **imported module**: you can simply `require` the module in Node.js applications thus using the [module API](#module-api). This should be used by application accessing file systems attached to the system.
 
 
+```bash
+⇒ npm install svc-fbr --global
+```
+
+
 ## Module API:
 
 ```js
@@ -144,6 +149,7 @@ Success response:
 ## terminal usage:
 
 ```bash
+⇒ svc-fbr help
 svc-fbr: file browser service
 
     ?, status      check status of service
