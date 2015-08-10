@@ -25,6 +25,22 @@ describe("lib/fs.handle", function() {
           should(err).not.be.ok();
           should(descriptor.isDirectory).eql(true);
           should(descriptor.content).be.an.Array();
+          let sample = descriptor.content[0];
+          should(sample.filename).be.a.String();
+          should(sample.path).be.a.String();
+          should(sample.mtime).be.an.instanceOf(Date);
+          return next();
+        });
+      },
+      dirUnstated: function(next) {
+        fs.handle({ path: __dirname, statEach: false }, function(err, descriptor) {
+          should(err).not.be.ok();
+          should(descriptor.isDirectory).eql(true);
+          should(descriptor.content).be.an.Array();
+          let sample = descriptor.content[0];
+          should(sample.filename).be.a.String();
+          should(sample.path).be.a.String();
+          should(sample.mtime).be.Undefined();
           return next();
         });
       },

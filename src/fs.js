@@ -13,9 +13,11 @@ exports = module.exports = {
 
 // built-in modules
 const fs = require("fs");
+const path = require("path");
 
 
 // npm-installed modules
+const async = require("async");
 const _ = require("lodash");
 
 
@@ -26,11 +28,10 @@ const _ = require("lodash");
  * @param {Function} callback
  */
 function handle(options, callback) {
-  let filepath = options.path;
   if (_.isString(options)) {
-    filepath = options;
+    options = { path: options };
   }
-  return fs.lstat(filepath, function(err, stats) {
+  return fs.lstat(options.path, function(err, stats) {
     if (err) {
       return callback(err);
     }
@@ -38,9 +39,9 @@ function handle(options, callback) {
     const done = wrap(stats, callback);
 
     if (stats.isDirectory()) {
-      return processDir(filepath, done);
+      return processDir(options, done);
     } else if (stats.isFile()) {
-      return processFile(filepath, done);
+      return processFile(options, done);
     }
 
     return callback(null, null);
@@ -81,15 +82,33 @@ function wrap(stats, callback) {
 /**
  * Process directory
  *
- * @param {String} filepath
+ * @param {Object} options
  * @param {Function} callback
  */
-function processDir(filepath, callback) {
-  return fs.readdir(filepath, function(err, dirs) {
+function processDir(options, callback) {
+  return fs.readdir(options.path, function(err, dirs) {
     if (err) {
       return callback(err);
     }
-    return callback(null, dirs);
+    return async.map(dirs, function(filename, done) {
+      const abspath = path.resolve(options.path, filename);
+      let stats = {
+        filename: filename,
+        path: abspath,
+      };
+
+      if (options.statEach === false) {
+        return done(null, stats);
+      }
+
+      fs.lstat(abspath, function(lstatErr, lstats) {
+        if (lstatErr) {
+          return done(lstatErr);
+        }
+        _.merge(stats, lstats);
+        return done(null, stats);
+      });
+    }, callback);
   });
 }
 
@@ -97,11 +116,11 @@ function processDir(filepath, callback) {
 /**
  * Process file
  *
- * @param {String} filepath
+ * @param {Object} options
  * @param {Function} callback
  */
-function processFile(filepath, callback) {
-  return fs.readFile(filepath, function(err, data) {
+function processFile(options, callback) {
+  return fs.readFile(options.path, function(err, data) {
     if (err) {
       return callback(err);
     }
