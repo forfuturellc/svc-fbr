@@ -6,4 +6,8 @@
 "use strict";
 
 
-exports = module.exports = require("./server");
+// npm-installed modules
+const _ = require("lodash");
+
+
+_.assign(exports, require("./server"), require("./fs"));
