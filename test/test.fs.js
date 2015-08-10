@@ -1,10 +1,6 @@
 "use strict";
 
 
-// built-in modules
-const FS = require("fs");
-
-
 // npm-installed modules
 const async = require("async");
 const should = require("should");

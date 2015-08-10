@@ -15,14 +15,21 @@ exports = module.exports = {
 const fs = require("fs");
 
 
+// npm-installed modules
+const _ = require("lodash");
+
 
 /**
  * Handling requests for browsing file-system
  *
- * @param {String} filepath
+ * @param {Object|String} options
  * @param {Function} callback
  */
-function handle(filepath, callback) {
+function handle(options, callback) {
+  let filepath = options.path;
+  if (_.isString(options)) {
+    filepath = options;
+  }
   return fs.lstat(filepath, function(err, stats) {
     if (err) {
       return callback(err);
