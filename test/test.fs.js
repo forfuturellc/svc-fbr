@@ -11,6 +11,7 @@ const should = require("should");
 
 
 // own modules
+const config = require("../lib/config");
 const fs = require("../lib/fs");
 
 
@@ -40,6 +41,15 @@ describe("lib/fs", function() {
 describe("lib/fs.handle", function() {
   it("common tests", function(done) {
     async.series({
+      falsyPaths: function(next) {
+        async.each([undefined, null, {}], function(val, next2) {
+          fs.handle(val, function(err, descriptor) {
+            should(err).not.be.ok();
+            should(descriptor.path).eql(config.home);
+            return next2();
+          });
+        }, next);
+      },
       dir: function(next) {
         fs.handle(mockPath, function(err, descriptor) {
           should(err).not.be.ok();

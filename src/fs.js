@@ -17,8 +17,12 @@ const path = require("path");
 
 
 // npm-installed modules
-const async = require("async");
 const _ = require("lodash");
+const async = require("async");
+
+
+// own modules
+const config = require("./config");
 
 
 /**
@@ -31,12 +35,22 @@ function handle(options, callback) {
   if (_.isString(options)) {
     options = { path: options };
   }
+
+  if (_.isObject(options)) {
+    const opts = { };
+    _.merge(opts, config, options);
+    options = opts;
+  } else {
+    options = _.cloneDeep(config);
+  }
+
+  options.path = options.path || config.home;
   return fs.lstat(options.path, function(err, stats) {
     if (err) {
       return callback(err);
     }
 
-    const done = wrap(stats, callback);
+    const done = wrap(options.path, stats, callback);
 
     if (stats.isDirectory()) {
       return processDir(options, done);
@@ -52,11 +66,15 @@ function handle(options, callback) {
 /**
  * Wrap callback
  *
+ * @param {String} filepath
  * @param {Object} stats - fs.Stats
  * @param {Function} callback
  * @return {Function}
  */
-function wrap(stats, callback) {
+function wrap(filepath, stats, callback) {
+  stats.path = filepath;
+  stats.filename = path.basename(filepath);
+
   return function(err, content) {
     if (err) {
       return callback(err);
