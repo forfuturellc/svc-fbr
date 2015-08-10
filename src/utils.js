@@ -8,6 +8,7 @@
 
 exports = module.exports = {
   addType,
+  getArgs,
 };
 
 
@@ -45,4 +46,30 @@ function addType(descriptor) {
     });
   }
   return descriptor;
+}
+
+
+/**
+ * Get arguments passed by user curated with configurations
+ *
+ * @param {Object} userArgs - arguments from user
+ * @param {Object[]} defaultArgs - default arguments to use
+ * @param {Function} userCallback - callback passed by user
+ */
+function getArgs(userArgs, defaultArgs, userCallback) {
+  let args = { };
+  let callback = userCallback || function() { };
+  defaultArgs.unshift(args);
+  _.assign.apply(null, defaultArgs);
+
+  if (_.isPlainObject(userArgs)) {
+    _.merge(args, userArgs);
+  } else {
+    callback = userArgs;
+  }
+
+  return {
+    options: args,
+    callback,
+  };
 }

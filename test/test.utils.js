@@ -35,3 +35,20 @@ describe("utils.addType", function() {
     should(stats.content[0].isFile).eql(true);
   });
 });
+
+
+describe("utils.getArgs", function() {
+  it("allows callback to be left out", function() {
+    should(utils.getArgs({}, [{}], undefined).callback).be.a.Function();
+  });
+
+  it("allows user args to be left out", function() {
+    should.deepEqual(utils.getArgs(undefined, [{}], function() {}).options, {});
+    let cb = function() { };
+    should.strictEqual(utils.getArgs(cb, [{}]).callback, cb);
+  });
+
+  it("assigns defaults", function() {
+    should.deepEqual(utils.getArgs({}, [{ name: "gocho"}, { lang: "es6" }]).options, { name: "gocho", lang: "es6" });
+  });
+});
