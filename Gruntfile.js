@@ -12,7 +12,6 @@ exports = module.exports = function(grunt) {
   grunt.initConfig({
     eslint: {
       src: ["Gruntfile.js", "src/**/*.js"],
-      test: ["test/**/*.js"],
     },
     mochaTest: {
       test: {
@@ -21,7 +20,7 @@ exports = module.exports = function(grunt) {
           quiet: false,
           clearRequireCache: false,
         },
-        src: ["ctest/**/test.*.js"],
+        src: ["test/**/test.*.js"],
       },
     },
   });
