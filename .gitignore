@@ -29,10 +29,10 @@ build/Release
 node_modules
 
 # babel output
-./bin/
-./config/
-./lib/
-./test/
+/bin/
+/config/
+/lib/
+/test/
 
 # temp dir for sails-disk
 .tmp/
