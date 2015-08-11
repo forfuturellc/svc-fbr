@@ -55,10 +55,12 @@ describe("lib/fs.handle", function() {
           should(err).not.be.ok();
           should(descriptor.isDirectory()).eql(true);
           should(descriptor.content).be.an.Array();
+          should(descriptor.mime).be.a.String();
           let sample = descriptor.content[0];
           should(sample.filename).be.a.String();
           should(sample.path).be.a.String();
           should(sample.mtime).be.an.instanceOf(Date);
+          should(sample.mime).be.a.String();
           should(hasFileWithName(descriptor, "..")).eql(true);
           should(hasFileWithName(descriptor, ".")).eql(true);
           return next();

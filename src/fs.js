@@ -19,6 +19,7 @@ const path = require("path");
 // npm-installed modules
 const _ = require("lodash");
 const async = require("async");
+const mime = require("mime");
 
 
 // own modules
@@ -29,7 +30,7 @@ const config = require("./config");
  * Handling requests for browsing file-system
  *
  * @param {Object|String} options
- * @param {Function} callback
+ * @callback {Function} callback
  */
 function handle(options, callback) {
   if (_.isString(options)) {
@@ -45,14 +46,15 @@ function handle(options, callback) {
   }
 
   options.path = options.path || config.home;
-  return fs.lstat(options.path, function(err, stats) {
+  return stat(options.path, function(err, stats) {
     if (err) {
       return callback(err);
     }
 
-    const done = wrap(options.path, stats, callback);
+    const done = wrap(stats, callback);
 
     if (stats.isDirectory()) {
+      options.dirStats = stats;
       return processDir(options, done);
     } else if (stats.isFile()) {
       return processFile(options, done);
@@ -64,17 +66,32 @@ function handle(options, callback) {
 
 
 /**
+ * Stat files
+ *
+ * @param {String} filepath - absolute path
+ * @callback {Function}
+ */
+function stat(filepath, callback) {
+  return fs.lstat(filepath, function(err, stats) {
+    if (err) {
+      return callback(err);
+    }
+    stats.path = filepath;
+    stats.filename = path.basename(filepath);
+    stats.mime = mime.lookup(filepath);
+    return callback(null, stats);
+  });
+}
+
+
+/**
  * Wrap callback
  *
- * @param {String} filepath
  * @param {Object} stats - fs.Stats
  * @param {Function} callback
  * @return {Function}
  */
-function wrap(filepath, stats, callback) {
-  stats.path = filepath;
-  stats.filename = path.basename(filepath);
-
+function wrap(stats, callback) {
   return function(err, content) {
     if (err) {
       return callback(err);
@@ -89,7 +106,8 @@ function wrap(filepath, stats, callback) {
  * Process directory
  *
  * @param {Object} options
- * @param {Function} callback
+ * @param {fs.Stats} options.dirStats
+ * @callback {Function} callback
  */
 function processDir(options, callback) {
   return fs.readdir(options.path, function(err, filenames) {
@@ -103,33 +121,47 @@ function processDir(options, callback) {
       });
     }
 
-    if (!options.ignoreUpDir) {
-      filenames.push("..");
-    }
-
-    if (!options.ignoreCurDir) {
-      filenames.push(".");
-    }
-
     return async.map(filenames, function(filename, done) {
-      const abspath = path.resolve(options.path, filename);
-      let stats = {
-        filename: filename,
-        path: abspath,
-      };
+      const abspath = path.join(options.path, filename);
 
       if (options.statEach === false) {
-        return done(null, stats);
+        return done(null, {
+          filename,
+          path: abspath,
+        });
       }
 
-      fs.lstat(abspath, function(lstatErr, lstats) {
-        if (lstatErr) {
-          return done(lstatErr);
+      stat(abspath, function(statErr, stats) {
+        if (statErr) {
+          return done(statErr);
         }
-        _.merge(stats, lstats);
         return done(null, stats);
       });
-    }, callback);
+    }, function(mapErr, statsMap) {
+      if (mapErr) {
+        return callback(err);
+      }
+
+      if (!options.ignoreCurDir) {
+        const stats = _.cloneDeep(options.dirStats);
+        stats.filename = ".";
+        statsMap.push(stats);
+      }
+
+      if (!options.ignoreUpDir) {
+        const abspath = path.join(options.path, "..");
+        return stat(abspath, function(statErr, stats) {
+          if (err) {
+            return callback(err);
+          }
+          stats.filename = "..";
+          statsMap.push(stats);
+          return callback(null, statsMap);
+        });
+      }
+
+      return callback(null, statsMap);
+    });
   });
 }
 
@@ -138,7 +170,7 @@ function processDir(options, callback) {
  * Process file
  *
  * @param {Object} options
- * @param {Function} callback
+ * @callback {Function} callback
  */
 function processFile(options, callback) {
   return fs.readFile(options.path, function(err, data) {
