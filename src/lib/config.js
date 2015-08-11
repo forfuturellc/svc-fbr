@@ -6,8 +6,25 @@
 "use strict";
 
 
+// built-in modules
+const path = require("path");
+
+
 // npm-installed modules
 const fixobj = require("fixed-object");
+
+
+// module variables
+let userConfig;
+
+
+// try load configuration file, if any
+try {
+  let configdir = path.join(process.env.HOME, ".fbr");
+
+} catch(err) {
+  // keep going, user might not have added a config file
+}
 
 
 exports = module.exports = fixobj({

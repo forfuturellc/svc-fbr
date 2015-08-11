@@ -29,8 +29,13 @@ build/Release
 node_modules
 
 # babel output
-lib/
-ctest/
+./bin/
+./config/
+./lib/
+./test/
 
 # temp dir for sails-disk
 .tmp/
+
+# configuration files
+config/production*
