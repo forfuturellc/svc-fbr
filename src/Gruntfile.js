@@ -3,15 +3,12 @@
  */
 
 
-"use strict";
-
-
-exports = module.exports = function(grunt) {
+export default function(grunt) {
   require("load-grunt-tasks")(grunt);
 
   grunt.initConfig({
     eslint: {
-      src: ["Gruntfile.js", "src/**/*.js"],
+      src: ["src/**/*.js"],
     },
     mochaTest: {
       test: {
@@ -26,4 +23,4 @@ exports = module.exports = function(grunt) {
   });
 
   grunt.registerTask("test", ["eslint", "mochaTest"]);
-};
+}

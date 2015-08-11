@@ -3,27 +3,24 @@
  */
 
 
-"use strict";
-
-
-exports = module.exports = {
+export default {
   handle,
 };
 
 
 // built-in modules
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
 
 
 // npm-installed modules
-const _ = require("lodash");
-const async = require("async");
-const mime = require("mime");
+import _ from "lodash";
+import async from "async";
+import mime from "mime";
 
 
 // own modules
-const config = require("./config");
+import config from "./config";
 
 
 /**

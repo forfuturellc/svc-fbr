@@ -33,6 +33,7 @@ node_modules
 /config/
 /lib/
 /test/
+/Gruntfile.js
 
 # temp dir for sails-disk
 .tmp/

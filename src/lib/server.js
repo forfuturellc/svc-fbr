@@ -20,12 +20,12 @@ const http = require("http");
 
 // npm-installed modules
 const _ = require("lodash");
+const config = require("config");
 const express = require("express");
 const request = require("request").defaults({ json: true });
 
 
 // own modules
-const config = require("./config");
 const fs = require("./fs");
 const utils = require("./utils");
 

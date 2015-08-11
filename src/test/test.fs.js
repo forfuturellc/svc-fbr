@@ -1,18 +1,15 @@
-"use strict";
-
-
 // built-in modules
-const path = require("path");
+import path from "path";
 
 
 // npm-installed modules
-const async = require("async");
-const should = require("should");
+import async from "async";
+import should from "should";
 
 
 // own modules
-const config = require("../lib/config");
-const fs = require("../lib/fs");
+import config from "../lib/config";
+import fs from "../lib/fs";
 
 
 // module variables

@@ -3,21 +3,18 @@
  */
 
 
-"use strict";
-
-
-exports = module.exports = {
+export default {
   addType,
   getArgs,
 };
 
 
 // built-in modules
-const fs = require("fs");
+import fs from "fs";
 
 
 // npm-installed modules
-const _ = require("lodash");
+import _ from "lodash";
 
 
 /**

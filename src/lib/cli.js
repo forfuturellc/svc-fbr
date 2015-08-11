@@ -3,19 +3,16 @@
  */
 
 
-"use strict";
-
-
 // npm-installed modules
-const _ = require("lodash");
-const out = require("cli-output");
-const parser = require("simple-argparse");
+import _ from "lodash";
+import out from "cli-output";
+import parser from "simple-argparse";
 
 
 // own modules
-const pkg = require("../package.json");
-const db = require("./db");
-const server = require("./server");
+import pkg from "../package.json";
+import db from "./db";
+import server from "./server";
 
 
 // defining the interface

@@ -18,14 +18,12 @@ exports = module.exports = {
 
 
 // npm-installed modules
+const _ = require("lodash");
 const async = require("async");
 const bcrypt = require("bcrypt");
+const config = require("config");
 const uuid = require("node-uuid");
 const Waterline = require("waterline");
-
-
-// own modules
-const config = require("./config");
 
 
 // module variables
@@ -49,9 +47,7 @@ const ormConfig = {
     default: adapter,
   },
   connections: {
-    default: {
-      adapter: "default",
-    },
+    default: _.merge({}, config.get("adapterConfig"), { adapter: "default" }),
   },
 };
 

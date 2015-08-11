@@ -1,12 +1,9 @@
-"use strict";
-
-
 // npm-installed modules
-const should = require("should");
+import should from "should";
 
 
 // own modules
-const server = require("../lib/server");
+import server from "../lib/server";
 
 
 describe("lib/server", function() {

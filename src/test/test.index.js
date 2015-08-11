@@ -1,19 +1,16 @@
-"use strict";
-
-
 // npm-installed modules
-const should = require("should");
+import should from "should";
 
 
 // own modules
-const fbr = require("../lib/index");
-const fs = require("../lib/fs");
-const server = require("../lib/server");
+import fbr from "../lib/index";
+import fs from "../lib/fs";
+import server from "../lib/server";
 
 
 describe("fbr", function() {
   it("exports the inner server and fs modules", function() {
-    should(fbr).containEql(server);
-    should(fbr).containEql(fs);
+    should.strictEqual(fbr.fs, fs);
+    should.strictEqual(fbr.server, server);
   });
 });

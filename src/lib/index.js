@@ -3,11 +3,11 @@
  */
 
 
-"use strict";
+// own modules
+import server from "./server";
+import fs from "./fs";
 
-
-// npm-installed modules
-const _ = require("lodash");
-
-
-_.assign(exports, require("./server"), require("./fs"));
+export default {
+  fs,
+  server,
+};

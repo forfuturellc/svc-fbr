@@ -1,16 +1,13 @@
-"use strict";
-
-
 // built-in modules
-const fs = require("fs");
+import fs from "fs";
 
 
 // npm-installed modules
-const should = require("should");
+import should from "should";
 
 
 // own modules
-const utils = require("../lib/utils");
+import utils from "../lib/utils";
 
 
 describe("utils.addType", function() {

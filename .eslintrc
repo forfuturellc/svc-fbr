@@ -3,6 +3,9 @@
     "es6": true,
     "node": true
   },
+  "ecmaFeatures": {
+    "modules": true
+  },
   "rules": {
     "comma-dangle": [2, "always-multiline"],
     "new-cap": [1],
