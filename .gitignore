@@ -32,3 +32,5 @@ node_modules
 lib/
 ctest/
 
+# temp dir for sails-disk
+.tmp/

@@ -30,7 +30,7 @@ const config = require("./config");
  * Handling requests for browsing file-system
  *
  * @param {Object|String} options
- * @callback {Function} callback
+ * @param {Function} callback
  */
 function handle(options, callback) {
   if (_.isString(options)) {
@@ -69,7 +69,7 @@ function handle(options, callback) {
  * Stat files
  *
  * @param {String} filepath - absolute path
- * @callback {Function}
+ * @param {Function}
  */
 function stat(filepath, callback) {
   return fs.lstat(filepath, function(err, stats) {
@@ -107,7 +107,7 @@ function wrap(stats, callback) {
  *
  * @param {Object} options
  * @param {fs.Stats} options.dirStats
- * @callback {Function} callback
+ * @param {Function} callback
  */
 function processDir(options, callback) {
   return fs.readdir(options.path, function(err, filenames) {
@@ -170,7 +170,7 @@ function processDir(options, callback) {
  * Process file
  *
  * @param {Object} options
- * @callback {Function} callback
+ * @param {Function} callback
  */
 function processFile(options, callback) {
   return fs.readFile(options.path, function(err, data) {
