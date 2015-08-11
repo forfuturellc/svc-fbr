@@ -4,11 +4,11 @@ import path from "path";
 
 // npm-installed modules
 import async from "async";
+import config from "config";
 import should from "should";
 
 
 // own modules
-import config from "../lib/config";
 import fs from "../lib/fs";
 
 
@@ -42,7 +42,7 @@ describe("lib/fs.handle", function() {
         async.each([undefined, null, {}], function(val, next2) {
           fs.handle(val, function(err, descriptor) {
             should(err).not.be.ok();
-            should(descriptor.path).eql(config.home);
+            should(descriptor.path).eql(config.get("home"));
             return next2();
           });
         }, next);

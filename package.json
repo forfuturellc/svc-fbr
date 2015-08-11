@@ -8,9 +8,10 @@
     "svc-fbr": "bin/svc-fbr"
   },
   "scripts": {
+    "clean": "rm -rf lib/ test/ config/",
     "prepublish": "npm run build",
     "pretest": "npm run build",
-    "build": "babel src --out-dir .",
+    "build": "npm run clean ; babel -D src --out-dir .",
     "test": "grunt test",
     "test-coverage": "istanbul cover _mocha --report lcovonly -- -R spec ctest/test.*.js"
   },

@@ -16,11 +16,8 @@ import path from "path";
 // npm-installed modules
 import _ from "lodash";
 import async from "async";
+import config from "config";
 import mime from "mime";
-
-
-// own modules
-import config from "./config";
 
 
 /**
@@ -42,7 +39,7 @@ function handle(options, callback) {
     options = _.cloneDeep(config);
   }
 
-  options.path = options.path || config.home;
+  options.path = options.path || config.get("home");
   return stat(options.path, function(err, stats) {
     if (err) {
       return callback(err);
