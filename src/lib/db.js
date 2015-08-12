@@ -7,12 +7,23 @@
 
 
 exports = module.exports = {
+  addLeaderToGroup: composeAddRemoveGroupMember({ roles: "leaders" }),
+  addUserToGroup: composeAddRemoveGroupMember({ roles: "members" }),
+  createGroup,
   createToken,
   createUser,
+  deleteGroup,
   deleteUser,
   deleteToken,
+  getGroup,
+  getGroups,
   getUser,
   getUsers,
+  isAdmin: composeIsInGroup({ groupname: "admin" }),
+  isLeaderInGroup: composeIsInGroup({ roles: "leaders" }),
+  isUserInGroup: composeIsInGroup({ roles: "members" }),
+  removeLeaderFromGroup: composeAddRemoveGroupMember({ action: "remove", roles: "leaders" }),
+  removeUserFromGroup: composeAddRemoveGroupMember({ action: "remove", roles: "members" }),
   tokenExists,
 };
 
@@ -66,6 +77,14 @@ const userCollection = Waterline.Collection.extend({
       collection: "token",
       via: "owner",
     },
+    groups: {
+      collection: "group",
+      via: "members",
+    },
+    leading: {
+      collection: "group",
+      via: "leaders",
+    },
   },
 });
 
@@ -78,6 +97,7 @@ const tokenCollection = Waterline.Collection.extend({
     uuid: {
       type: "string",
       required: true,
+      unique: true,
     },
     owner: {
       model: "user",
@@ -86,9 +106,34 @@ const tokenCollection = Waterline.Collection.extend({
 });
 
 
+// groups collection
+const groupCollection = Waterline.Collection.extend({
+  identity: "group",
+  connection: "default",
+  attributes: {
+    name: {
+      type: "string",
+      required: true,
+      unique: true,
+    },
+    members: {
+      collection: "user",
+      via: "groups",
+      dominant: true,
+    },
+    leaders: {
+      collection: "user",
+      via: "leading",
+      dominant: true,
+    },
+  },
+});
+
+
 // load collections into orm
 orm.loadCollection(userCollection);
 orm.loadCollection(tokenCollection);
+orm.loadCollection(groupCollection);
 
 
 /**
@@ -107,8 +152,77 @@ function getModels(done) {
       throw err;
     }
 
+    // make the models available as soon as possible for other functions
     models = m;
+
+    // ignore error if groups already created
+    let catcher = (createErr) => { if (createErr && createErr.code !== "E_VALIDATION") { throw createErr; } };
+
+    // create the administrators group
+    createGroup("admin", catcher);
+
+    // create the public group
+    createGroup("public", catcher);
+
     return done(models);
+  });
+}
+
+
+/**
+ * Create a new group
+ */
+function createGroup(name, done) {
+  return getModels(function(m) {
+    return m.collections.group.create({ name }, done);
+  });
+}
+
+
+/**
+ * Get a group. It populates the members and leaders automatically.
+ *
+ * @param {String} name
+ * @param {Function} done - done(err, group)
+ */
+function getGroup(name, done) {
+  return getModels(function(m) {
+    return m.collections.group.findOne({ name })
+      .populate("members").populate("leaders").exec(done);
+  });
+}
+
+
+/**
+ * Get all groups. Members and leaders are not loaded automatically.
+ * This is by design; avoid too much data fetching.
+ *
+ * @param {Function} done - done(err, groups)
+ */
+function getGroups(done) {
+  return getModels(function(m) {
+    return m.collections.group.find().exec(done);
+  });
+}
+
+
+/**
+ * Delete a group
+ *
+ * @param {String} name
+ * @param {Function} done - done(err)
+ */
+function deleteGroup(name, done) {
+  return getGroup(name, function(getGroupErr, group) {
+    if (getGroupErr) {
+      return done(getGroupErr);
+    }
+
+    if (!group) {
+      return done(new Error(`group '${name}' not found`));
+    }
+
+    return group.destroy(done);
   });
 }
 
@@ -116,13 +230,64 @@ function getModels(done) {
 /**
  * Create a new user
  *
- * @param {String} username
+ * @param {Object} details
+ * @param {String} details.username
+ * @param {String} details.group
  * @param {Function} done - done(err, user)
  */
-function createUser(username, done) {
-  return getModels(function(m) {
-    return m.collections.user.create({ username }, done);
+function createUser({ username, group="public" }, done) {
+  return getGroup(group, function(getGroupErr, theGroup) {
+    if (getGroupErr) {
+      return done(getGroupErr);
+    }
+
+    if (!theGroup) {
+      return done(new Error(`group '${group}' not found`));
+    }
+
+    theGroup.members.add({ username });
+    return theGroup.save(done);
   });
+}
+
+
+/**
+ * Compose function for removing or adding user to group
+ *
+ * @param {Boolean} [action="add"]
+ */
+function composeAddRemoveGroupMember({ action="add", roles="members" }) {
+  /**
+   * Add/Remove user from group
+   *
+   * @param {String} username
+   * @param {String} groupname
+   * @param {Function} done - done(err)
+   */
+   return function(username, groupname, done) {
+     return getGroup(groupname, function(getGroupErr, group) {
+       if (getGroupErr) {
+         return done(getGroupErr);
+       }
+
+       if (!group) {
+         return done(new Error(`group '${groupname}' not found`));
+       }
+
+       return getUser(username, function(getUserErr, user) {
+         if (getUserErr) {
+           return done(getUserErr);
+         }
+
+         if (!user) {
+           return done(new Error(`user '${username}' not found`));
+         }
+
+         group[roles][action](user.id);
+         return group.save(done);
+       });
+     });
+   };
 }
 
 
@@ -134,9 +299,43 @@ function createUser(username, done) {
  */
 function getUser(username, done) {
   return getModels(function(m) {
-    return m.collections.user.findOne({ username }).populate("tokens").exec(done);
+    return m.collections.user.findOne({ username })
+      .populate("tokens")
+      .populate("groups")
+      .populate("leading")
+      .exec(done);
   });
 }
+
+
+function composeIsInGroup({ defaultGroupname, roles="members" }) {
+  /**
+   * Check if user is in group
+   *
+   * @param {String} username
+   * @param {Function} done - done(err, bool)
+   */
+  return function({ username, groupname }, done) {
+    return getGroup(groupname || defaultGroupname, function(getGroupErr, group) {
+      if (getGroupErr) {
+        return done(getGroupErr);
+      }
+
+      if (!group) {
+        return done(new Error(`no admin group found`));
+      }
+
+      for (let index = 0, len = group.members.length; index < len; index++) {
+        if (group[roles][index].username === username) {
+          return done(null, true);
+        }
+      }
+
+      return done(null, false);
+    });
+  };
+}
+
 
 
 /**
@@ -156,6 +355,8 @@ function deleteUser(username, done) {
     }
 
     user.tokens.forEach((token) => token.destroy());
+    user.groups.forEach((group) => { group.members.remove(user.id); group.save(); });
+    user.leading.forEach((group) => { group.leaders.remove(user.id); group.save(); });
     user.destroy(done);
   });
 }

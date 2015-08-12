@@ -23,6 +23,7 @@ parser
   .option("s", "start", "start service", startService)
   .option("x", "stop", "stop service", stopService)
   .option("?", "status", "check status of service", checkStatus)
+  .option("g", "groups", "control groups", controlGroups)
   .option("u", "users", "control users", controlUsers)
   .option("t", "tokens", "control tokens", controlTokens)
   .parse();
@@ -73,16 +74,95 @@ function checkStatus() {
 }
 
 
+function controlGroups() {
+  if (this.create) {
+    return db.createGroup(this.name, pingBack("created"));
+  }
+
+  if (this.delete) {
+    return db.deleteGroup(this.group, pingBack("deleted"));
+  }
+
+  if (this.add) {
+    return db.addUserToGroup(this.username, this.group, pingBack("added"));
+  }
+
+  if (this.remove) {
+    return db.removeUserFromGroup(this.username, this.group, pingBack("removed"));
+  }
+
+  if (this.addLeader) {
+    return db.addLeaderToGroup(this.username, this.group, pingBack("added"));
+  }
+
+  if (this.removeLeader) {
+    return db.removeLeaderFromGroup(this.username, this.group, pingBack("removed"));
+  }
+
+  if (this.group) {
+    return listGroup(this.group);
+  }
+
+  return listGroups();
+}
+
+
+function pingBack(msg) {
+  return function(err) {
+    if (err) {
+      return out.error("error occurred: %j", err);
+    }
+
+    return out.success(msg);
+  };
+}
+
+
+function listGroups() {
+  return db.getGroups(function(getGroupsErr, groups) {
+    if (getGroupsErr) {
+      return out.error(`error occurred: ${getGroupsErr}`);
+    }
+
+    if (!groups.length) {
+      return out.error("no groups found");
+    }
+
+    return out.pjson(groups.map((group) => _.pick(group, "name")));
+  });
+}
+
+
+function listGroup(name) {
+  db.getGroup(name, function(getErr, group) {
+    if (getErr) {
+      return out.error(`error occurred: ${getErr}`);
+    }
+
+    if (!group) {
+      return out.error(`group '${name}' not found`);
+    }
+
+    return out.pjson({
+      name,
+      "members": group.members.length,
+      "leaders": group.leaders.length,
+      "created on": group.createdAt,
+    });
+  });
+}
+
+
 /**
  * Control users
  */
 function controlUsers() {
   if (this.create) {
-    return createUser(this.username);
+    return db.createUser(this, pingBack("created"));
   }
 
   if (this.delete) {
-    return deleteUser(this.username);
+    return db.deleteUser(this.username, pingBack("deleted"));
   }
 
   if (this.username) {
@@ -123,37 +203,11 @@ function listUser(username) {
 
     return out.pjson({
       username: user.username,
-      "num of tokens": user.tokens.length,
+      groups: user.groups.map((group) => group.name),
+      leader: user.leading.map((group) => group.name),
+      tokens: user.tokens.length,
       "created on": user.createdAt,
     });
-  });
-}
-
-
-/**
- * Create user
- */
-function createUser(username) {
-  db.createUser(username, function(createErr) {
-    if (createErr) {
-      return out.error(`error occurred: ${createErr}`);
-    }
-
-    return out.success(`user '${username}' created`);
-  });
-}
-
-
-/**
- * Delete user
- */
-function deleteUser(username) {
-  db.deleteUser(username, function(deleteErr) {
-    if (deleteErr) {
-      return out.error(`error occurred: ${deleteErr}`);
-    }
-
-    return out.success(`user '${username}' deleted`);
   });
 }
 
@@ -164,7 +218,7 @@ function controlTokens() {
   }
 
   if (this.delete) {
-    return deleteToken(this.username, this.token);
+    return db.deleteToken(this.username, this.token, pingBack("deleted"));
   }
 
   if (this.check) {
@@ -181,17 +235,6 @@ function createToken(username) {
 
     out.success(`token for user '${username}' created: ${token}`);
     out.info("you only see this token once");
-  });
-}
-
-
-function deleteToken(username, token) {
-  db.deleteToken(username, token, function(deleteErr) {
-    if (deleteErr) {
-      return out.error(`error occurred: ${deleteErr}`);
-    }
-
-    return out.success(`token '${token}' deleted`);
   });
 }
 
